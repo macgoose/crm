@@ -1,0 +1,6 @@
+.git
+.idea
+**/target
+.m2-local
+*.mv.db
+*.trace.db

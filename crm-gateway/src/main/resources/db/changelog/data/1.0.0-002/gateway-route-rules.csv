@@ -1,0 +1,2 @@
+id,route_key,http_method,path_pattern,access_mode,permission_code,target_uri,enabled,rule_order
+1,legacy-crm-service,POST,/crm/terminal-api/v1/CrmServiceRest,AUTHENTICATED,NULL,http://192.168.151.14:8080/crm/terminal-api/v1/CrmServiceRest,true,200

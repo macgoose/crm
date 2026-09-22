@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="1.0.0-002-load-demo-route-rules" author="openai" context="dev">
+        <loadData
+                file="db/changelog/data/1.0.0-002/gateway-route-rules.csv"
+                tableName="gateway_route_rule"
+                separator=","/>
+        <rollback>
+            <delete tableName="gateway_route_rule">
+                <where>route_key IN ('organizations-read', 'legacy-crm-service')</where>
+            </delete>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

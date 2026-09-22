@@ -1,0 +1,43 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: crm-gateway
+  datasource:
+    url: ${DB_URL:jdbc:h2:file:./crm-gateway;AUTO_SERVER=TRUE}
+    username: ${DB_USERNAME:crm}
+    password: ${DB_PASSWORD:crm}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    contexts: ${LIQUIBASE_CONTEXTS:dev}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AVANPOST_ISSUER_URI:https://mfa.spimex.com}
+          jwk-set-uri: ${AVANPOST_JWK_SET_URI:https://mfa.spimex.com/oauth2/jwks}
+          audiences: ${AVANPOST_AUDIENCE:crm}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+crm:
+  identity:
+    source: ${IDENTITY_SOURCE:JWT}
+    login-claim: ${IDENTITY_LOGIN_CLAIM:preferred_username}
+    email-claim: ${IDENTITY_EMAIL_CLAIM:email}
+    email-verified-claim: ${IDENTITY_EMAIL_VERIFIED_CLAIM:email_verified}
+    trust-unverified-email: ${IDENTITY_TRUST_UNVERIFIED_EMAIL:false}
+    user-info-uri: ${AVANPOST_USERINFO_URI:https://mfa.spimex.com/oauth2/userinfo}
+  user-service:
+    base-url: ${CRM_USER_SERVICE_URL:http://localhost:8081}
+    connect-timeout: ${CRM_USER_SERVICE_CONNECT_TIMEOUT:2s}
+    read-timeout: ${CRM_USER_SERVICE_READ_TIMEOUT:3s}

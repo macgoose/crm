@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        logicalFilePath="db/changelog/changes/1.0.0-001.xml"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="001-create-schema" author="m.litvinyuk">
+
+        <!-- ========================================================= -->
+        <!-- CRM USER                                                  -->
+        <!-- ========================================================= -->
+
+        <createTable tableName="user">
+            <column name="id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="login" type="varchar(255)"/>
+
+            <column name="email" type="varchar(320)">
+                <constraints checkConstraint="login is not null or email is not null"/>
+            </column>
+
+            <column name="fio" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="short_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="active" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="version" type="bigint">
+                <constraints
+                        nullable="false"
+                        checkConstraint="version &gt; 0"/>
+            </column>
+
+            <column
+                    name="created_at"
+                    type="timestamp with time zone"
+                    defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column
+                    name="updated_at"
+                    type="timestamp with time zone"
+                    defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey
+                tableName="user"
+                columnNames="id"
+                constraintName="pk_user"/>
+
+        <addUniqueConstraint
+                tableName="user"
+                columnNames="login"
+                constraintName="uk_user_login"/>
+
+        <addUniqueConstraint
+                tableName="user"
+                columnNames="email"
+                constraintName="uk_user_email"/>
+
+
+        <!-- ========================================================= -->
+        <!-- ROLE                                                      -->
+        <!-- ========================================================= -->
+
+        <createTable tableName="role">
+            <column name="id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="code" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey
+                tableName="role"
+                columnNames="id"
+                constraintName="pk_role"/>
+
+        <addUniqueConstraint
+                tableName="role"
+                columnNames="code"
+                constraintName="uk_role_code"/>
+
+
+        <!-- ========================================================= -->
+        <!-- PERMISSION                                                -->
+        <!-- ========================================================= -->
+
+        <createTable tableName="permission">
+            <column name="id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="code" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey
+                tableName="permission"
+                columnNames="id"
+                constraintName="pk_permission"/>
+
+        <addUniqueConstraint
+                tableName="permission"
+                columnNames="code"
+                constraintName="uk_permission_code"/>
+
+
+        <!-- ========================================================= -->
+        <!-- USER ↔ ROLE                                               -->
+        <!-- ========================================================= -->
+
+        <createTable tableName="user_role">
+            <column name="user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="role_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column
+                    name="assigned_at"
+                    type="timestamp with time zone"
+                    defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey
+                tableName="user_role"
+                columnNames="user_id, role_id"
+                constraintName="pk_user_role"/>
+
+        <addForeignKeyConstraint
+                baseTableName="user_role"
+                baseColumnNames="user_id"
+                referencedTableName="user"
+                referencedColumnNames="id"
+                constraintName="fk_user_role_user"/>
+
+        <addForeignKeyConstraint
+                baseTableName="user_role"
+                baseColumnNames="role_id"
+                referencedTableName="role"
+                referencedColumnNames="id"
+                constraintName="fk_user_role_role"/>
+
+        <createIndex
+                tableName="user_role"
+                indexName="ix_user_role_role">
+            <column name="role_id"/>
+        </createIndex>
+
+
+        <!-- ========================================================= -->
+        <!-- ROLE ↔ PERMISSION                                         -->
+        <!-- ========================================================= -->
+
+        <createTable tableName="role_permission">
+            <column name="role_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="permission_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey
+                tableName="role_permission"
+                columnNames="role_id, permission_id"
+                constraintName="pk_role_permission"/>
+
+        <addForeignKeyConstraint
+                baseTableName="role_permission"
+                baseColumnNames="role_id"
+                referencedTableName="role"
+                referencedColumnNames="id"
+                constraintName="fk_role_permission_role"/>
+
+        <addForeignKeyConstraint
+                baseTableName="role_permission"
+                baseColumnNames="permission_id"
+                referencedTableName="permission"
+                referencedColumnNames="id"
+                constraintName="fk_role_permission_permission"/>
+
+        <createIndex
+                tableName="role_permission"
+                indexName="ix_role_permission_permission">
+            <column name="permission_id"/>
+        </createIndex>
+
+
+        <!-- ========================================================= -->
+        <!-- USER GROUP                                                -->
+        <!-- ========================================================= -->
+
+        <createTable tableName="user_group">
+            <column name="id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="parent_id" type="uuid">
+                <constraints
+                        nullable="true"
+                        checkConstraint="parent_id &lt;&gt; id"/>
+            </column>
+
+            <column name="code" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey
+                tableName="user_group"
+                columnNames="id"
+                constraintName="pk_user_group"/>
+
+        <addUniqueConstraint
+                tableName="user_group"
+                columnNames="code"
+                constraintName="uk_user_group_code"/>
+
+        <addForeignKeyConstraint
+                baseTableName="user_group"
+                baseColumnNames="parent_id"
+                referencedTableName="user_group"
+                referencedColumnNames="id"
+                constraintName="fk_user_group_parent"/>
+
+        <createIndex
+                tableName="user_group"
+                indexName="ix_user_group_parent">
+            <column name="parent_id"/>
+        </createIndex>
+
+
+        <!-- ========================================================= -->
+        <!-- USER GROUP ↔ USER                                         -->
+        <!-- ========================================================= -->
+
+        <createTable tableName="user_group_member">
+            <column name="group_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column
+                    name="added_at"
+                    type="timestamp with time zone"
+                    defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey
+                tableName="user_group_member"
+                columnNames="group_id, user_id"
+                constraintName="pk_user_group_member"/>
+
+        <addForeignKeyConstraint
+                baseTableName="user_group_member"
+                baseColumnNames="group_id"
+                referencedTableName="user_group"
+                referencedColumnNames="id"
+                constraintName="fk_group_member_group"/>
+
+        <addForeignKeyConstraint
+                baseTableName="user_group_member"
+                baseColumnNames="user_id"
+                referencedTableName="user"
+                referencedColumnNames="id"
+                constraintName="fk_group_member_user"/>
+
+        <createIndex
+                tableName="user_group_member"
+                indexName="ix_group_member_user">
+            <column name="user_id"/>
+        </createIndex>
+
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="1.0.0-001-create-gateway-route-rule" author="openai">
+        <createTable tableName="gateway_route_rule">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="route_key" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="http_method" type="VARCHAR(10)">
+                <constraints nullable="false" checkConstraint="http_method &lt;&gt; '*' AND TRIM(http_method) &lt;&gt; ''"/>
+            </column>
+            <column name="path_pattern" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="access_mode" type="VARCHAR(20)">
+                <constraints
+                        nullable="false"
+                        checkConstraint="(access_mode = 'PERMISSION' AND permission_code IS NOT NULL AND TRIM(permission_code) &lt;&gt; '') OR (access_mode = 'AUTHENTICATED' AND permission_code IS NULL)"/>
+            </column>
+            <column name="permission_code" type="VARCHAR(100)">
+            </column>
+            <column name="target_uri" type="VARCHAR(1000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rule_order" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="gateway_route_rule" indexName="idx_gateway_route_rule_enabled_order">
+            <column name="enabled"/>
+            <column name="rule_order"/>
+        </createIndex>
+
+        <addUniqueConstraint
+                tableName="gateway_route_rule"
+                columnNames="http_method,path_pattern"
+                constraintName="uk_gateway_route_rule_method_path"/>
+
+        <rollback>
+            <dropTable tableName="gateway_route_rule"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
