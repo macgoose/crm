@@ -6,7 +6,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="002-add-dev-data" author="m.litvinyuk" context="local">
-        <loadData tableName="user" file="../data/1.0.0-002/users.csv" relativeToChangelogFile="true" encoding="UTF-8"/>
+        <loadData tableName="users" file="../data/1.0.0-002/users.csv" relativeToChangelogFile="true" encoding="UTF-8"/>
         <loadData tableName="user_group" file="../data/1.0.0-002/user-groups.csv" relativeToChangelogFile="true" encoding="UTF-8"/>
         <loadData tableName="user_group_member" file="../data/1.0.0-002/user-group-members.csv" relativeToChangelogFile="true" encoding="UTF-8"/>
         <loadData tableName="role" file="../data/1.0.0-002/roles.csv" relativeToChangelogFile="true" encoding="UTF-8"/>
@@ -41,7 +41,7 @@
             <delete tableName="user_group">
                 <where>id in ('30000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000004')</where>
             </delete>
-            <delete tableName="user">
+            <delete tableName="users">
                 <where>id in ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222',
                     '40000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000002',
                     '40000000-0000-0000-0000-000000000003', '40000000-0000-0000-0000-000000000004',

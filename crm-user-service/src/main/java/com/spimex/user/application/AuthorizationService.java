@@ -38,8 +38,7 @@ public class AuthorizationService {
                 resolution.userVersion());
         }
 
-        log.info("Authorization allowed: userId={} permission={}",
-            resolution.userId(), normalizeCode(permission));
+        log.debug("Authorization allowed: userId={} permission={}", resolution.userId(), normalizeCode(permission));
         return AuthorizationDecision.allowed(resolution.userId(), resolution.userVersion());
     }
 

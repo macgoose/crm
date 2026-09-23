@@ -1,6 +1,10 @@
 server:
   port: ${SERVER_PORT:8081}
 
+logging:
+  level:
+    com.spimex: DEBUG
+
 spring:
   application:
     name: crm-user-service

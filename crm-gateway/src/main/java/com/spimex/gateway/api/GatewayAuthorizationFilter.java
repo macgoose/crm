@@ -80,7 +80,7 @@ public class GatewayAuthorizationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            log.info("Access granted: routeKey={} method={} path={} userId={}",
+            log.debug("Access granted: routeKey={} method={} path={} userId={}",
                 rule.getRouteKey(), request.getMethod(), request.getRequestURI(), internalIdentity.getUserId());
             filterChain.doFilter(new TrustedIdentityRequest(request, internalIdentity), response);
         } catch (IdentityResolutionException exception) {

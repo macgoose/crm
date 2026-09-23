@@ -4,3 +4,4 @@ target/
 *.iml
 *.trace.db
 *.mv.db
+*.lock.db

@@ -32,6 +32,7 @@ public class RouteRuleMatcher {
         compiledRules = rules.stream()
             .map(this::compile)
             .toList();
+
         log.info("Loaded and compiled {} enabled gateway route rules", compiledRules.size());
     }
 
