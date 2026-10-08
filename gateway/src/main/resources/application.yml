@@ -42,5 +42,3 @@ crm:
     user-info-uri: ${AVANPOST_USERINFO_URI:https://mfa.spimex.com/oauth2/userinfo}
   user-service:
     base-url: ${CRM_USER_SERVICE_URL:http://localhost:8081}
-    connect-timeout: ${CRM_USER_SERVICE_CONNECT_TIMEOUT:2s}
-    read-timeout: ${CRM_USER_SERVICE_READ_TIMEOUT:3s}

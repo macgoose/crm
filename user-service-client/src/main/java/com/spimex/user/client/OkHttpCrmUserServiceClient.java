@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -24,6 +25,18 @@ public final class OkHttpCrmUserServiceClient implements CrmUserServiceClient {
     private final HttpUrl userResolutionUrl;
     private final Gson gson;
     private final HttpUrl usersUrl;
+
+    public OkHttpCrmUserServiceClient(String baseUrl) {
+        this(
+            baseUrl,
+            new OkHttpClient.Builder()
+                .connectTimeout(Duration.ofSeconds(2))
+                .readTimeout(Duration.ofSeconds(3))
+                .retryOnConnectionFailure(false)
+                .build(),
+            new Gson()
+        );
+    }
 
     public OkHttpCrmUserServiceClient(String baseUrl, OkHttpClient httpClient) {
         this(baseUrl, httpClient, new Gson());
