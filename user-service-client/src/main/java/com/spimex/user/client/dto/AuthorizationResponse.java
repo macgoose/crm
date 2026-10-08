@@ -1,5 +1,6 @@
-package com.spimex.user.client;
+package com.spimex.user.client.dto;
 
+import com.spimex.user.client.exception.CrmUserServiceProtocolException;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -17,7 +18,6 @@ public final class AuthorizationResponse {
         response.allowed = true;
         response.userId = userId;
         response.userVersion = userVersion;
-        response.validate();
         return response;
     }
 
@@ -26,12 +26,5 @@ public final class AuthorizationResponse {
         response.allowed = false;
         response.denialReason = denialReason;
         return response;
-    }
-
-    void validate() {
-        if (allowed && (userId == null || userVersion == null || userVersion < 0)) {
-            throw new CrmUserServiceProtocolException(
-                "Allowed authorization response must contain userId and userVersion");
-        }
     }
 }

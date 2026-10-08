@@ -1,7 +1,7 @@
 package com.spimex.user.api;
 
 import com.spimex.user.application.UserQueryService;
-import com.spimex.user.client.UserResponse;
+import com.spimex.user.client.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

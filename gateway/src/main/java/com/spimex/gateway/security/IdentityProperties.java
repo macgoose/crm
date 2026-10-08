@@ -25,5 +25,4 @@ public class IdentityProperties {
     private String emailVerifiedClaim = "email_verified";
     private boolean trustUnverifiedEmail;
     private URI userInfoUri = URI.create("http://localhost:9090/oauth2/userinfo");
-
 }

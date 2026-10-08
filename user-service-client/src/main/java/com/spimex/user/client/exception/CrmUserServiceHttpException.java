@@ -1,4 +1,4 @@
-package com.spimex.user.client;
+package com.spimex.user.client.exception;
 
 import lombok.Getter;
 

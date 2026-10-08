@@ -65,6 +65,7 @@ class RouteRuleMatcherTest {
         when(rule.getAccessMode()).thenReturn(mode);
         when(rule.getPermissionCode()).thenReturn(permission);
         when(rule.getTargetUri()).thenReturn("http://localhost:8082");
+
         return rule;
     }
 }

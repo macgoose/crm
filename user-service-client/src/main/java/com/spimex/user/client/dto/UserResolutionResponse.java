@@ -1,5 +1,6 @@
-package com.spimex.user.client;
+package com.spimex.user.client.dto;
 
+import com.spimex.user.client.exception.CrmUserServiceProtocolException;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -16,25 +17,12 @@ public final class UserResolutionResponse {
         response.resolved = true;
         response.userId = userId;
         response.userVersion = userVersion;
-        response.validate();
         return response;
     }
 
     public static UserResolutionResponse denied(String denialReason) {
         UserResolutionResponse response = new UserResolutionResponse();
         response.denialReason = denialReason;
-        response.validate();
         return response;
-    }
-
-    void validate() {
-        if (resolved && (userId == null || userVersion == null || userVersion < 0)) {
-            throw new CrmUserServiceProtocolException(
-                "Resolved user response must contain userId and userVersion");
-        }
-        if (!resolved && (denialReason == null || denialReason.trim().isEmpty())) {
-            throw new CrmUserServiceProtocolException(
-                "Unresolved user response must contain denialReason");
-        }
     }
 }

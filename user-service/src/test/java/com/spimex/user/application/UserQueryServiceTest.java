@@ -1,6 +1,6 @@
 package com.spimex.user.application;
 
-import com.spimex.user.client.UserResponse;
+import com.spimex.user.client.dto.UserResponse;
 import com.spimex.user.domain.model.user.User;
 import com.spimex.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.Test;

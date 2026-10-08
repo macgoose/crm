@@ -2,6 +2,10 @@ package com.spimex.user.client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import com.spimex.user.client.dto.*;
+import com.spimex.user.client.exception.CrmUserServiceHttpException;
+import com.spimex.user.client.exception.CrmUserServiceProtocolException;
+import com.spimex.user.client.exception.CrmUserServiceUnavailableException;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,17 +32,20 @@ public final class OkHttpCrmUserServiceClient implements CrmUserServiceClient {
     OkHttpCrmUserServiceClient(String baseUrl, OkHttpClient httpClient, Gson gson) {
         this.httpClient = Objects.requireNonNull(httpClient, "httpClient must not be null");
         this.gson = Objects.requireNonNull(gson, "gson must not be null");
+
         HttpUrl parsedBaseUrl = HttpUrl.parse(Objects.requireNonNull(baseUrl, "baseUrl must not be null"));
-        if (parsedBaseUrl == null) {
+        if (parsedBaseUrl == null)
             throw new IllegalArgumentException("baseUrl is not a valid HTTP URL");
-        }
-        this.usersUrl = parsedBaseUrl.newBuilder().addPathSegments("users").build();
+
+        this.usersUrl = parsedBaseUrl.newBuilder()
+            .addPathSegments("users")
+            .build();
         this.authorizationUrl = parsedBaseUrl.newBuilder()
-                .addPathSegments("authorization-decisions")
-                .build();
+            .addPathSegments("authorization-decisions")
+            .build();
         this.userResolutionUrl = parsedBaseUrl.newBuilder()
-                .addPathSegments("user-resolutions")
-                .build();
+            .addPathSegments("user-resolutions")
+            .build();
     }
 
     @Override
@@ -47,22 +54,22 @@ public final class OkHttpCrmUserServiceClient implements CrmUserServiceClient {
         Request request = new Request.Builder()
             .url(usersUrl.newBuilder().addPathSegment(userId.toString()).build())
             .get().header("Accept", "application/json").build();
+
         try (Response response = httpClient.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
+            if (!response.isSuccessful())
                 throw new CrmUserServiceHttpException(response.code());
-            }
+
             ResponseBody body = response.body();
-            if (body == null) {
+            if (body == null)
                 throw new CrmUserServiceProtocolException("CRM user service returned an empty response");
-            }
+
             UserResponse result = gson.fromJson(body.charStream(), UserResponse.class);
-            if (result == null) {
+            if (result == null)
                 throw new CrmUserServiceProtocolException("CRM user service returned an empty JSON response");
-            }
-            result.validate();
-            if (!userId.equals(result.getId())) {
+
+            if (!userId.equals(result.getId()))
                 throw new CrmUserServiceProtocolException("CRM user service returned a different user");
-            }
+
             return result;
         } catch (JsonParseException exception) {
             throw new CrmUserServiceProtocolException("CRM user service returned invalid JSON", exception);
@@ -76,30 +83,37 @@ public final class OkHttpCrmUserServiceClient implements CrmUserServiceClient {
         Objects.requireNonNull(authorizationRequest, "request must not be null");
         RequestBody body = RequestBody.create(gson.toJson(authorizationRequest), JSON);
         Request request = new Request.Builder()
-                .url(authorizationUrl)
-                .post(body)
-                .header("Accept", "application/json")
-                .build();
+            .url(authorizationUrl)
+            .post(body)
+            .header("Accept", "application/json")
+            .build();
 
-        log.debug("Calling CRM user service authorization endpoint; permission={}",
-                authorizationRequest.getPermission());
+        log.debug(
+            "Calling CRM user service authorization endpoint; permission={}",
+            authorizationRequest.getPermission()
+        );
+
         try (Response response = httpClient.newCall(request).execute()) {
             log.debug("CRM user service authorization endpoint responded with status={}", response.code());
+
             if (!response.isSuccessful()) {
                 log.warn("CRM user service authorization endpoint returned status={}", response.code());
                 throw new CrmUserServiceHttpException(response.code());
             }
+
             ResponseBody responseBody = response.body();
-            if (responseBody == null) {
+            if (responseBody == null)
                 throw new CrmUserServiceProtocolException("CRM user service returned an empty response");
-            }
+
             AuthorizationResponse result = gson.fromJson(responseBody.charStream(), AuthorizationResponse.class);
-            if (result == null) {
+            if (result == null)
                 throw new CrmUserServiceProtocolException("CRM user service returned an empty JSON response");
-            }
-            result.validate();
-            log.debug("CRM user service authorization decision received; allowed={} userId={}",
-                    result.isAllowed(), result.getUserId());
+
+            log.debug(
+                "CRM user service authorization decision received; allowed={} userId={}",
+                result.isAllowed(), result.getUserId()
+            );
+
             return result;
         } catch (JsonParseException exception) {
             log.warn("CRM user service authorization response is invalid JSON", exception);
@@ -115,30 +129,34 @@ public final class OkHttpCrmUserServiceClient implements CrmUserServiceClient {
         Objects.requireNonNull(userResolutionRequest, "request must not be null");
         RequestBody body = RequestBody.create(gson.toJson(userResolutionRequest), JSON);
         Request request = new Request.Builder()
-                .url(userResolutionUrl)
-                .post(body)
-                .header("Accept", "application/json")
-                .build();
+            .url(userResolutionUrl)
+            .post(body)
+            .header("Accept", "application/json")
+            .build();
 
         log.debug("Calling CRM user service user-resolution endpoint");
+
         try (Response response = httpClient.newCall(request).execute()) {
             log.debug("CRM user service user-resolution endpoint responded with status={}", response.code());
+
             if (!response.isSuccessful()) {
                 log.warn("CRM user service user-resolution endpoint returned status={}", response.code());
                 throw new CrmUserServiceHttpException(response.code());
             }
+
             ResponseBody responseBody = response.body();
-            if (responseBody == null) {
+            if (responseBody == null)
                 throw new CrmUserServiceProtocolException("CRM user service returned an empty response");
-            }
-            UserResolutionResponse result = gson.fromJson(
-                    responseBody.charStream(), UserResolutionResponse.class);
-            if (result == null) {
+
+            UserResolutionResponse result = gson.fromJson(responseBody.charStream(), UserResolutionResponse.class);
+            if (result == null)
                 throw new CrmUserServiceProtocolException("CRM user service returned an empty JSON response");
-            }
-            result.validate();
-            log.debug("CRM user service user-resolution result received; resolved={} userId={}",
-                    result.isResolved(), result.getUserId());
+
+            log.debug(
+                "CRM user service user-resolution result received; resolved={} userId={}",
+                result.isResolved(), result.getUserId()
+            );
+
             return result;
         } catch (JsonParseException exception) {
             log.warn("CRM user service user-resolution response is invalid JSON", exception);

@@ -32,9 +32,9 @@ public final class IdentityHeaders {
         } catch (NumberFormatException exception) {
             throw new IdentityHeaderException(INVALID_USER_VERSION, USER_VERSION + " must contain a number");
         }
-        if (userVersion < 0) {
+
+        if (userVersion < 0)
             throw new IdentityHeaderException(INVALID_USER_VERSION, USER_VERSION + " must not be negative");
-        }
 
         return new InternalIdentity(userId, userVersion);
     }
@@ -43,13 +43,14 @@ public final class IdentityHeaders {
         Map<String, String> result = new LinkedHashMap<>();
         result.put(USER_ID, identity.getUserId().toString());
         result.put(USER_VERSION, Long.toString(identity.getUserVersion()));
+
         return Collections.unmodifiableMap(result);
     }
 
     private static String required(String value, IdentityHeaderException.Reason reason, String name) {
-        if (value == null || value.trim().isEmpty()) {
+        if (value == null || value.trim().isEmpty())
             throw new IdentityHeaderException(reason, name + " is required");
-        }
+
         return value.trim();
     }
 }

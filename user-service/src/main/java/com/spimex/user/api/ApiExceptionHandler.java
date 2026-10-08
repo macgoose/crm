@@ -15,6 +15,7 @@ public class ApiExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ProblemDetail handleValidation(MethodArgumentNotValidException exception) {
         log.warn("Rejected invalid API request: errorCount={}", exception.getBindingResult().getErrorCount());
+
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.BAD_REQUEST,
             "Request validation failed"

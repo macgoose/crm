@@ -1,5 +1,6 @@
 package com.spimex.user.client;
 
+import com.spimex.user.client.dto.UserResolutionRequest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -6,9 +6,9 @@ import com.spimex.gateway.domain.RouteRule;
 import com.spimex.gateway.security.AvanpostIdentityResolver;
 import com.spimex.gateway.security.ExternalIdentity;
 import com.spimex.identity.IdentityHeaders;
-import com.spimex.user.client.AuthorizationResponse;
+import com.spimex.user.client.dto.AuthorizationResponse;
 import com.spimex.user.client.CrmUserServiceClient;
-import com.spimex.user.client.UserResolutionResponse;
+import com.spimex.user.client.dto.UserResolutionResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
@@ -51,7 +51,7 @@ class GatewayAuthorizationFilterTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
         filter.doFilter(request(), response, (request, ignored) ->
             propagatedUserId.set(((jakarta.servlet.http.HttpServletRequest) request)
-                .getHeader(IdentityHeaders.USER_ID)));
+            .getHeader(IdentityHeaders.USER_ID)));
 
         assertEquals(userId.toString(), propagatedUserId.get());
         verify(userServiceClient).resolveUser(any());
@@ -114,6 +114,7 @@ class GatewayAuthorizationFilterTest {
     private static MockHttpServletRequest request() {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/test");
         request.setRequestURI("/test");
+
         return request;
     }
 
@@ -121,6 +122,7 @@ class GatewayAuthorizationFilterTest {
         RouteRule rule = mock(RouteRule.class);
         when(rule.getAccessMode()).thenReturn(accessMode);
         when(rule.getPermissionCode()).thenReturn(permission);
+
         return rule;
     }
 }

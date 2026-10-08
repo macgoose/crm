@@ -1,4 +1,4 @@
-package com.spimex.user.client;
+package com.spimex.user.client.exception;
 
 public class CrmUserServiceException extends RuntimeException {
 

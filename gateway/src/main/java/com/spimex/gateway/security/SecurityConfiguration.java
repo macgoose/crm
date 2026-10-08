@@ -28,15 +28,18 @@ public class SecurityConfiguration {
     GatewayAuthorizationFilter gatewayAuthorizationFilter(
         RouteRuleMatcher routeRuleMatcher,
         AvanpostIdentityResolver identityResolver,
-        CrmUserServiceClient userServiceClient) {
+        CrmUserServiceClient userServiceClient
+    ) {
         return new GatewayAuthorizationFilter(routeRuleMatcher, identityResolver, userServiceClient);
     }
 
     @Bean
     FilterRegistrationBean<GatewayAuthorizationFilter> disableContainerRegistration(
-        GatewayAuthorizationFilter filter) {
+        GatewayAuthorizationFilter filter
+    ) {
         FilterRegistrationBean<GatewayAuthorizationFilter> registration = new FilterRegistrationBean<>(filter);
         registration.setEnabled(false);
+
         return registration;
     }
 
@@ -72,8 +75,10 @@ public class SecurityConfiguration {
             ? HttpServletResponse.SC_SERVICE_UNAVAILABLE
             : HttpServletResponse.SC_UNAUTHORIZED;
 
-        log.warn("JWT authentication failed for method={} path={} status={}: {}",
-            request.getMethod(), request.getRequestURI(), status, exception.getMessage());
+        log.warn(
+            "JWT authentication failed for method={} path={} status={}: {}",
+            request.getMethod(), request.getRequestURI(), status, exception.getMessage()
+        );
         response.sendError(status);
     }
 }

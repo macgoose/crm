@@ -22,8 +22,10 @@ public class GatewayRoutesConfiguration {
         RouterFunction<ServerResponse> routes = null;
 
         for (RouteRule rule : routeRuleMatcher.rules()) {
-            log.debug("Registering gateway route routeKey={} method={} path={} target={}",
-                rule.getRouteKey(), rule.getHttpMethod(), rule.getPathPattern(), rule.getTargetUri());
+            log.debug(
+                "Registering gateway route routeKey={} method={} path={} target={}",
+                rule.getRouteKey(), rule.getHttpMethod(), rule.getPathPattern(), rule.getTargetUri()
+            );
             RequestPredicate predicate = RequestPredicates
                 .method(HttpMethod.valueOf(rule.getHttpMethod()))
                 .and(RequestPredicates.path(rule.getPathPattern()));
@@ -48,6 +50,7 @@ public class GatewayRoutesConfiguration {
 
         if (routes == null) {
             log.warn("No enabled gateway routes were configured");
+
             return RouterFunctions.route(
                 RequestPredicates.path("/__no_gateway_routes__"),
                 request -> ServerResponse.notFound().build()
@@ -55,6 +58,7 @@ public class GatewayRoutesConfiguration {
         }
 
         log.info("Registered {} database-backed gateway routes", routeRuleMatcher.rules().size());
+
         return routes;
     }
 }

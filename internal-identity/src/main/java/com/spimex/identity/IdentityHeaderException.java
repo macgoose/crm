@@ -18,5 +18,4 @@ public final class IdentityHeaderException extends IllegalArgumentException {
         super(message);
         this.reason = reason;
     }
-
 }

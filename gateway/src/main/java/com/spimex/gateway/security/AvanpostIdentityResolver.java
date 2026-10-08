@@ -36,6 +36,7 @@ public class AvanpostIdentityResolver {
 
     public ExternalIdentity resolve(Jwt jwt, String bearerToken) {
         log.debug("Resolving external identity using source={}", properties.getSource());
+
         if (properties.getSource() == IdentityProperties.Source.USERINFO) {
             log.debug("Identity source requires userinfo request");
             return resolveFromUserInfo(bearerToken);
@@ -44,8 +45,11 @@ public class AvanpostIdentityResolver {
         ExternalIdentity identity = extract(jwt.getClaims());
 
         if (hasIdentity(identity)) {
-            log.debug("Usable identity found in JWT: loginPresent={} emailPresent={}",
-                identity.login() != null, identity.email() != null);
+            log.debug(
+                "Usable identity found in JWT: loginPresent={} emailPresent={}",
+                identity.login() != null, identity.email() != null
+            );
+
             return identity;
         }
 
@@ -53,6 +57,7 @@ public class AvanpostIdentityResolver {
             return requireIdentity(identity);
 
         log.debug("JWT has no usable identity; falling back to userinfo");
+
         return resolveFromUserInfo(bearerToken);
     }
 
@@ -62,40 +67,27 @@ public class AvanpostIdentityResolver {
 
     private Map<String, ?> loadUserInfo(String bearerToken) {
         if (bearerToken == null || bearerToken.isBlank())
-            throw new IdentityResolutionException(
-                "Bearer token is required for userinfo"
-            );
+            throw new IdentityResolutionException("Bearer token is required for userinfo");
 
         Request request = createUserInfoRequest(bearerToken);
 
         try (Response response = httpClient.newCall(request).execute()) {
             log.debug("Userinfo endpoint responded with status={}", response.code());
+
             if (!response.isSuccessful())
-                throw new IdentityProviderUnavailableException(
-                    "Avanpost userinfo returned HTTP " + response.code()
-                );
+                throw new IdentityProviderUnavailableException("Avanpost userinfo returned HTTP " + response.code());
 
             ResponseBody body = response.body();
-
             if (body == null)
-                throw new IdentityProviderUnavailableException(
-                    "Avanpost userinfo returned an empty response"
-                );
+                throw new IdentityProviderUnavailableException("Avanpost userinfo returned an empty response");
 
             JsonObject json = gson.fromJson(body.charStream(), JsonObject.class);
-
             if (json == null)
-                throw new IdentityProviderUnavailableException(
-                    "Avanpost userinfo returned an empty JSON response"
-                );
+                throw new IdentityProviderUnavailableException("Avanpost userinfo returned an empty JSON response");
 
             return gson.fromJson(json, userInfoType);
-
         } catch (IOException | JsonParseException exception) {
-            throw new IdentityProviderUnavailableException(
-                "Avanpost userinfo is unavailable",
-                exception
-            );
+            throw new IdentityProviderUnavailableException("Avanpost userinfo is unavailable", exception);
         }
     }
 
@@ -109,17 +101,9 @@ public class AvanpostIdentityResolver {
     }
 
     private ExternalIdentity extract(Map<String, ?> claims) {
-        String login = stringValue(
-            claims.get(properties.getLoginClaim())
-        );
-
-        String email = stringValue(
-            claims.get(properties.getEmailClaim())
-        );
-
-        boolean emailVerified = booleanValue(
-            claims.get(properties.getEmailVerifiedClaim())
-        );
+        String login = stringValue(claims.get(properties.getLoginClaim()));
+        String email = stringValue(claims.get(properties.getEmailClaim()));
+        boolean emailVerified = booleanValue(claims.get(properties.getEmailVerifiedClaim()));
 
         if (!properties.isTrustUnverifiedEmail() && !emailVerified)
             email = null;
@@ -129,16 +113,13 @@ public class AvanpostIdentityResolver {
 
     private ExternalIdentity requireIdentity(ExternalIdentity identity) {
         if (!hasIdentity(identity))
-            throw new IdentityResolutionException(
-                "Token does not contain a usable login or verified email"
-            );
+            throw new IdentityResolutionException("Token does not contain a usable login or verified email");
 
         return identity;
     }
 
     private static boolean hasIdentity(ExternalIdentity identity) {
-        return identity != null
-            && (identity.login() != null || identity.email() != null);
+        return identity != null && (identity.login() != null || identity.email() != null);
     }
 
     private static String stringValue(Object value) {

@@ -45,8 +45,11 @@ public class RouteRuleMatcher {
             .filter(rule -> rule.matches(method, path))
             .map(MatchedRouteRule::rule)
             .findFirst();
-        log.debug("Route match for method={} path={}: {}", method, path,
-            result.map(RouteRule::getRouteKey).orElse("none"));
+        log.debug(
+            "Route match for method={} path={}: {}", method, path,
+            result.map(RouteRule::getRouteKey).orElse("none")
+        );
+
         return result;
     }
 
@@ -65,50 +68,47 @@ public class RouteRuleMatcher {
             requireText(rule.getHttpMethod(), "httpMethod");
             requireText(rule.getPathPattern(), "pathPattern");
             requireText(rule.getTargetUri(), "targetUri");
-            if ("*".equals(rule.getHttpMethod())) {
+            if ("*".equals(rule.getHttpMethod()))
                 throw new IllegalStateException(
-                    "Route " + rule.getRouteKey() + " must declare an explicit HTTP method");
-            }
+                    "Route " + rule.getRouteKey() + " must declare an explicit HTTP method"
+                );
             HttpMethod.valueOf(rule.getHttpMethod());
             parser.parse(rule.getPathPattern());
             URI target = URI.create(rule.getTargetUri());
             if (!("http".equalsIgnoreCase(target.getScheme())
                 || "https".equalsIgnoreCase(target.getScheme()))
-                || target.getHost() == null) {
+                || target.getHost() == null)
                 throw new IllegalStateException(
-                    "Route " + rule.getRouteKey() + " has invalid HTTP targetUri");
-            }
+                    "Route " + rule.getRouteKey() + " has invalid HTTP targetUri"
+                );
 
-            if (rule.getAccessMode() == null) {
+            if (rule.getAccessMode() == null)
                 throw new IllegalStateException("Route " + rule.getRouteKey() + " has no accessMode");
-            }
             if (rule.getAccessMode() == AccessMode.PERMISSION
-                && !hasText(rule.getPermissionCode())) {
+                && !hasText(rule.getPermissionCode()))
                 throw new IllegalStateException(
-                    "PERMISSION route " + rule.getRouteKey() + " has no permissionCode");
-            }
+                    "PERMISSION route " + rule.getRouteKey() + " has no permissionCode"
+                );
             if (rule.getAccessMode() == AccessMode.AUTHENTICATED
-                && rule.getPermissionCode() != null) {
+                && rule.getPermissionCode() != null)
                 throw new IllegalStateException(
-                    "AUTHENTICATED route " + rule.getRouteKey() + " must not have permissionCode");
-            }
+                    "AUTHENTICATED route " + rule.getRouteKey() + " must not have permissionCode"
+                );
 
             String endpoint = rule.getHttpMethod() + " " + rule.getPathPattern();
-            if (!endpoints.add(endpoint)) {
+            if (!endpoints.add(endpoint))
                 throw new IllegalStateException("Duplicate gateway endpoint: " + endpoint);
-            }
 
-            if (parser.parse(rule.getPathPattern()).matches(PathPatternParserSupport.path("/actuator/health"))) {
+            if (parser.parse(rule.getPathPattern()).matches(PathPatternParserSupport.path("/actuator/health")))
                 throw new IllegalStateException(
-                    "Database route " + rule.getRouteKey() + " must not match /actuator/health");
-            }
+                    "Database route " + rule.getRouteKey() + " must not match /actuator/health"
+                );
         }
     }
 
     private static void requireText(String value, String field) {
-        if (!hasText(value)) {
+        if (!hasText(value))
             throw new IllegalStateException("Route " + field + " must not be blank");
-        }
     }
 
     private static boolean hasText(String value) {

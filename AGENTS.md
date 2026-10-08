@@ -93,6 +93,19 @@ Both application modules use Liquibase and support file-based H2 locally plus Po
 - Avoid `@Data` on JPA entities and security/domain types because it can expose unsafe setters, equality, or string representations.
 - Keep explicit constructors and methods when they enforce validation, normalization, invariants, or other domain behavior. Lombok must not hide business logic.
 
+## Java code formatting
+
+Use `user-service-client/src/main/java/com/spimex/user/client/OkHttpCrmUserServiceClient.java` as the formatting reference for new and changed Java code.
+
+- Use four spaces per indentation level. Indent continuation lines by one additional level, rather than aligning them with an opening parenthesis.
+- Keep opening braces on the declaration/control-flow line and closing braces on their own line. Write `} catch (...) {` on one line.
+- Omit braces for a simple `if` whose body is a single statement, especially guard clauses with `throw` or `return`. Put the body on the next line and indent it by four spaces. Keep braces for multiple statements or nested control flow where omission would be ambiguous.
+- Separate logical steps with a single blank line: request construction, logging, executing an HTTP call, checking its status, reading the body, parsing, validation, and returning the result. Keep a value declaration and its immediate guard check together.
+- For a multiline fluent chain, put the initial expression on the first line and subsequent calls on continuation lines beginning with a dot. Use a consistent four-space continuation indent, including `.build()`. Short, readable chains may remain on one line.
+- Keep a method call on one line when it remains readable. When splitting its argument list, put the opening parenthesis after the method name, start arguments on the next line, and put the closing `);` on its own line aligned with the method call. Related short arguments may share a line; do not force one argument per line.
+- Separate fields from constructors and methods, and separate methods from one another, with a single blank line. Keep annotations immediately above the declaration they annotate.
+- Apply these rules to code being added or edited; avoid unrelated formatting changes across the repository.
+
 ## Verification
 
 Use the Maven wrapper if one is added later; currently use the installed Maven executable.

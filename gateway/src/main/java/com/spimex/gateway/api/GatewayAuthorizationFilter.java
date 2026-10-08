@@ -8,12 +8,12 @@ import com.spimex.gateway.security.ExternalIdentity;
 import com.spimex.gateway.security.IdentityProviderUnavailableException;
 import com.spimex.gateway.security.IdentityResolutionException;
 import com.spimex.identity.InternalIdentity;
-import com.spimex.user.client.AuthorizationRequest;
-import com.spimex.user.client.AuthorizationResponse;
+import com.spimex.user.client.dto.AuthorizationRequest;
+import com.spimex.user.client.dto.AuthorizationResponse;
 import com.spimex.user.client.CrmUserServiceClient;
-import com.spimex.user.client.CrmUserServiceException;
-import com.spimex.user.client.UserResolutionRequest;
-import com.spimex.user.client.UserResolutionResponse;
+import com.spimex.user.client.exception.CrmUserServiceException;
+import com.spimex.user.client.dto.UserResolutionRequest;
+import com.spimex.user.client.dto.UserResolutionResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,6 +56,7 @@ public class GatewayAuthorizationFilter extends OncePerRequestFilter {
 
         if (rule == null) {
             log.warn("Access denied: no route rule for {} {}", request.getMethod(), request.getRequestURI());
+
             reject(response, HttpServletResponse.SC_FORBIDDEN, "ACCESS_DENIED");
             return;
         }
@@ -63,6 +64,7 @@ public class GatewayAuthorizationFilter extends OncePerRequestFilter {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication instanceof JwtAuthenticationToken jwtAuthentication)) {
             log.warn("Unauthenticated request to {} {}", request.getMethod(), request.getRequestURI());
+
             reject(response, HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHENTICATED");
             return;
         }
@@ -74,37 +76,48 @@ public class GatewayAuthorizationFilter extends OncePerRequestFilter {
 
             InternalIdentity internalIdentity = resolveInternalIdentity(rule, externalIdentity);
             if (internalIdentity == null) {
-                log.warn("Access denied for routeKey={} method={} path={}",
-                    rule.getRouteKey(), request.getMethod(), request.getRequestURI());
+                log.warn(
+                    "Access denied for routeKey={} method={} path={}",
+                    rule.getRouteKey(), request.getMethod(), request.getRequestURI()
+                );
                 reject(response, HttpServletResponse.SC_FORBIDDEN, "ACCESS_DENIED");
                 return;
             }
 
-            log.debug("Access granted: routeKey={} method={} path={} userId={}",
-                rule.getRouteKey(), request.getMethod(), request.getRequestURI(), internalIdentity.getUserId());
+            log.debug(
+                "Access granted: routeKey={} method={} path={} userId={}",
+                rule.getRouteKey(), request.getMethod(), request.getRequestURI(), internalIdentity.getUserId()
+            );
             filterChain.doFilter(new TrustedIdentityRequest(request, internalIdentity), response);
         } catch (IdentityResolutionException exception) {
             int status = exception instanceof IdentityProviderUnavailableException
-                ? HttpServletResponse.SC_SERVICE_UNAVAILABLE
-                : HttpServletResponse.SC_FORBIDDEN;
+            ? HttpServletResponse.SC_SERVICE_UNAVAILABLE
+            : HttpServletResponse.SC_FORBIDDEN;
 
-            log.warn("Identity resolution failed for routeKey={} method={} path={} status={}: {}",
-                rule.getRouteKey(), request.getMethod(), request.getRequestURI(), status, exception.getMessage());
+            log.warn(
+                "Identity resolution failed for routeKey={} method={} path={} status={}: {}",
+                rule.getRouteKey(), request.getMethod(), request.getRequestURI(), status, exception.getMessage()
+            );
             reject(response, status, status == 503 ? "IDENTITY_PROVIDER_UNAVAILABLE" : "ACCESS_DENIED");
         } catch (CrmUserServiceException exception) {
-            log.warn("User service call failed for routeKey={} method={} path={}: {}",
-                rule.getRouteKey(), request.getMethod(), request.getRequestURI(), exception.getMessage(), exception);
+            log.warn(
+                "User service call failed for routeKey={} method={} path={}: {}",
+                rule.getRouteKey(), request.getMethod(), request.getRequestURI(), exception.getMessage(), exception
+            );
             reject(response, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "USER_SERVICE_UNAVAILABLE");
         }
     }
 
     private InternalIdentity resolveInternalIdentity(RouteRule rule, ExternalIdentity externalIdentity) {
-        log.debug("Resolving internal identity for routeKey={} accessMode={} loginPresent={} emailPresent={}",
-            rule.getRouteKey(), rule.getAccessMode(), externalIdentity.login() != null, externalIdentity.email() != null);
+        log.debug(
+            "Resolving internal identity for routeKey={} accessMode={} loginPresent={} emailPresent={}",
+            rule.getRouteKey(), rule.getAccessMode(), externalIdentity.login() != null, externalIdentity.email() != null
+        );
         if (rule.getAccessMode() == AccessMode.AUTHENTICATED) {
             UserResolutionResponse resolution = userServiceClient.resolveUser(
                 new UserResolutionRequest(externalIdentity.login(), externalIdentity.email())
             );
+
             return resolution.isResolved()
                 ? new InternalIdentity(resolution.getUserId(), resolution.getUserVersion())
                 : null;
@@ -115,6 +128,7 @@ public class GatewayAuthorizationFilter extends OncePerRequestFilter {
             externalIdentity.email(),
             rule.getPermissionCode()
         ));
+
         return decision.isAllowed()
             ? new InternalIdentity(decision.getUserId(), decision.getUserVersion())
             : null;
@@ -122,9 +136,8 @@ public class GatewayAuthorizationFilter extends OncePerRequestFilter {
 
     private static String bearerToken(HttpServletRequest request) {
         String value = request.getHeader("Authorization");
-        if (value == null || !value.regionMatches(true, 0, "Bearer ", 0, 7)) {
+        if (value == null || !value.regionMatches(true, 0, "Bearer ", 0, 7))
             return null;
-        }
         return value.substring(7).trim();
     }
 

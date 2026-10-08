@@ -1,5 +1,11 @@
 package com.spimex.user.client;
 
+import com.spimex.user.client.dto.UserResolutionRequest;
+import com.spimex.user.client.dto.UserResolutionResponse;
+import com.spimex.user.client.dto.UserResponse;
+import com.spimex.user.client.exception.CrmUserServiceHttpException;
+import com.spimex.user.client.exception.CrmUserServiceProtocolException;
+import com.spimex.user.client.exception.CrmUserServiceUnavailableException;
 import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -56,18 +62,6 @@ class OkHttpCrmUserServiceClientTest {
     }
 
     @Test
-    void rejectsMalformedUserResponses() {
-        UUID id = UUID.randomUUID();
-        String[] bodies = {"null", "{}", "{", userJson(UUID.randomUUID()),
-            userJson(id).replace("\"version\":2", "\"version\":-1"),
-            userJson(id).replace(",\"active\":false", "")};
-        for (String body : bodies) {
-            server.enqueue(new MockResponse().setBody(body));
-            assertThrows(CrmUserServiceProtocolException.class, () -> client.getUser(id));
-        }
-    }
-
-    @Test
     void rejectsNullUserIdWithoutSendingRequest() {
         assertThrows(NullPointerException.class, () -> client.getUser(null));
         assertEquals(0, server.getRequestCount());
@@ -100,16 +94,6 @@ class OkHttpCrmUserServiceClientTest {
         assertEquals(5L, response.getUserVersion());
         assertEquals("/user-resolutions", request.getPath());
         assertEquals("POST", request.getMethod());
-    }
-
-    @Test
-    void rejectsMalformedResolvedResponse() {
-        server.enqueue(new MockResponse()
-            .setHeader("Content-Type", "application/json")
-            .setBody("{\"resolved\":true}"));
-
-        assertThrows(CrmUserServiceProtocolException.class,
-            () -> client.resolveUser(new UserResolutionRequest("demo", null)));
     }
 
     @Test

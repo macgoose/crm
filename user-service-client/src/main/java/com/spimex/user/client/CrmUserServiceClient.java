@@ -1,8 +1,12 @@
 package com.spimex.user.client;
 
+import com.spimex.user.client.dto.*;
+
+import java.util.UUID;
+
 public interface CrmUserServiceClient {
 
-    UserResponse getUser(java.util.UUID userId);
+    UserResponse getUser(UUID userId);
 
     AuthorizationResponse authorize(AuthorizationRequest request);
 

@@ -23,5 +23,4 @@ public interface UserRepository extends JpaRepository<User, UUID> {
                and p.code = :permission
             """, nativeQuery = true)
     boolean hasPermission(@Param("userId") UUID userId, @Param("permission") String permission);
-
 }

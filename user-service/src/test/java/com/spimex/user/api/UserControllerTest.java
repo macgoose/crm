@@ -1,7 +1,7 @@
 package com.spimex.user.api;
 
 import com.spimex.user.application.UserQueryService;
-import com.spimex.user.client.UserResponse;
+import com.spimex.user.client.dto.UserResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;

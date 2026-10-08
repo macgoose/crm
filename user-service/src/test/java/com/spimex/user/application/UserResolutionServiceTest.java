@@ -79,6 +79,7 @@ class UserResolutionServiceTest {
         when(user.getId()).thenReturn(UUID.randomUUID());
         when(user.getVersion()).thenReturn(3L);
         when(user.isActive()).thenReturn(active);
+
         return user;
     }
 }

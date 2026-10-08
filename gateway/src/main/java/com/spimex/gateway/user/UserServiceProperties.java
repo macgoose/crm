@@ -14,5 +14,4 @@ public class UserServiceProperties {
     private String baseUrl = "http://localhost:8081";
     private Duration connectTimeout = Duration.ofSeconds(2);
     private Duration readTimeout = Duration.ofSeconds(3);
-
 }
