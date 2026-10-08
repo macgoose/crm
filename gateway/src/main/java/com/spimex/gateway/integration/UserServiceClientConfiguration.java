@@ -1,4 +1,4 @@
-package com.spimex.gateway.user;
+package com.spimex.gateway.integration;
 
 import com.spimex.user.client.CrmUserServiceClient;
 import com.spimex.user.client.OkHttpCrmUserServiceClient;
