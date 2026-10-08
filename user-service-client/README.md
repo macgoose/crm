@@ -5,13 +5,7 @@ Java 11-совместимый клиент внутреннего API `user-ser
 приложение, поэтому один экземпляр можно безопасно переиспользовать.
 
 ```java
-OkHttpClient http = new OkHttpClient.Builder()
-    .connectTimeout(Duration.ofSeconds(2))
-    .readTimeout(Duration.ofSeconds(3))
-    .build();
-
-CrmUserServiceClient users =
-    new OkHttpCrmUserServiceClient("http://user-service:8081", http);
+CrmUserServiceClient users = new OkHttpCrmUserServiceClient("http://user-service:8081");
 
 AuthorizationResponse decision = users.authorize(
     new AuthorizationRequest("demo.admin", null, "ORGANIZATION_READ"));
@@ -41,3 +35,7 @@ HTTP 404 (пользователь не найден) и другие ошибо
 Недоступность сервиса — `CrmUserServiceUnavailableException`, некорректный
 ответ или несовпадающий UUID — `CrmUserServiceProtocolException`.
 Null вместо UUID отклоняется до HTTP-запроса.
+
+## Бизнес-применение
+
+[Пользователь CRM во внутреннем downstream-сервисе](<docs/Синхронизация пользователя в downstream-сервисе.md>): чтение заголовков, необязательная сверка версий и обновление локального профиля.
