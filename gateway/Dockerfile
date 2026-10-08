@@ -1,5 +1,5 @@
 ### Этап 1: собираем зависимости и приложение
-FROM maven:3.9.9-eclipse-temurin-21 AS builder
+FROM nxs-test.spimex.dom:8083/spimex-maven:3.9.6-eclipse-temurin-21 AS builder
 WORKDIR /app
 
 # Сначала копируем POM-файлы, чтобы слой с зависимостями кешировался отдельно.

@@ -2,27 +2,22 @@ package com.spimex.gateway.user;
 
 import com.spimex.user.client.CrmUserServiceClient;
 import com.spimex.user.client.OkHttpCrmUserServiceClient;
-import okhttp3.OkHttpClient;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+@Getter
+@Setter
 @Configuration
+@ConfigurationProperties(prefix = "crm.user-service")
 public class UserServiceClientConfiguration {
 
-    @Bean
-    OkHttpClient internalHttpClient(UserServiceProperties properties) {
-        return new OkHttpClient.Builder()
-            .connectTimeout(properties.getConnectTimeout())
-            .readTimeout(properties.getReadTimeout())
-            .retryOnConnectionFailure(false)
-            .build();
-    }
+    private String baseUrl = "http://localhost:8081";
 
     @Bean
-    CrmUserServiceClient crmUserServiceClient(
-        UserServiceProperties properties,
-        OkHttpClient internalHttpClient
-    ) {
-        return new OkHttpCrmUserServiceClient(properties.getBaseUrl(), internalHttpClient);
+    CrmUserServiceClient crmUserServiceClient() {
+        return new OkHttpCrmUserServiceClient(getBaseUrl());
     }
 }
