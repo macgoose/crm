@@ -10,9 +10,9 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>crm-internal-identity</module>
-        <module>crm-user-service-client</module>
-        <module>crm-user-service</module>
-        <module>crm-gateway</module>
+        <module>internal-identity</module>
+        <module>user-service-client</module>
+        <module>user-service</module>
+        <module>gateway</module>
     </modules>
 </project>
